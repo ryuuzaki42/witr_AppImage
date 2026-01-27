@@ -34,6 +34,7 @@ jobs:
         cd squashfs-root/
 
         version="0.2.6"
+        echo "witr version: $version"
         wget https://github.com/pranshuparmar/witr/releases/download/v$version/witr-linux-amd64
         chmod +x witr-linux-amd64
         #rm -v python* .DirIcon AppRun
@@ -54,13 +55,9 @@ jobs:
         Icon=python
         Categories=Development;
         Terminal=true
-        echo'> witr.desktop
+        '> witr.desktop
 
-        echo "witr version: $version"
         pwd; ls -lah
-
-        #cat witr.desktop
-        #sed -i "s/Name=.*/Name=witr/" witr.desktop
         cat witr.desktop
 
         cd ../
@@ -79,7 +76,7 @@ jobs:
         all_Parameters=$@
         echo -e "all_Parameters: $all_Parameters\n"
 
-        ./witr-linux-amd64
+        ./witr-linux-amd64 $all_Parameters
         echo'> squashfs-root/AppRun
         chmod +x squashfs-root/AppRun
         cat squashfs-root/AppRun
