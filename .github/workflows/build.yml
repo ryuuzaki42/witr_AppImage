@@ -1,0 +1,159 @@
+name: Create new release
+# Test 2.47
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "!**"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Install fuse and libfuse2
+      run: sudo apt install fuse libfuse2
+
+    - name: Get appimagetool
+      run: |
+        set -x
+        version_go_appimage=$(wget -q -O - https://api.github.com/repos/probonopd/go-appimage/releases | grep "\"name.*appimagetool-.*-x86_64.AppImage\"" | head -n 1 | cut -d '-' -f2)
+        echo "version_go_appimage: $version_go_appimage"
+
+        wget -q "https://github.com/probonopd/go-appimage/releases/download/continuous/appimagetool-$version_go_appimage-x86_64.AppImage" -O appimagetool-x86_64.AppImage
+        chmod +x appimagetool-x86_64.AppImage
+        pwd; ls -lah
+
+    - name: Get Pyhton AppImage
+      run: |
+        set -x
+        wget https://github.com/ryuuzaki42/Python_to_make_AppImage/releases/download/06/python3.13.3-cp313-cp313-manylinux2014_x86_64.AppImage
+        fileName=$(ls python3*.AppImage)
+        chmod +x "$fileName"
+        ./"$fileName" --appimage-extract
+        pwd; ls -lah
+
+    - name: Install TrID and update pip
+      run: |
+        set -x
+        cd squashfs-root/opt/python3*/bin/
+        pwd; ls -lah
+
+        wget https://mark0.net/download/trid.zip
+        wget https://mark0.net/download/triddefs.zip
+        pwd; ls -lah
+
+        unzip trid.zip
+        unzip triddefs.zip
+        rm trid.zip triddefs.zip
+
+        ./pip3.* install --upgrade pip
+
+         #./python3.* trid.py || ls
+
+         # Edit the folder of cache file, .triddefs.trd, from local (./) to tmp (/tmp/) folder
+         sed -i 's/cachefilename = path.parent \/ cachefilename/cachefilename = "\/tmp\/" + str(path.parent \/ cachefilename)/' trid.py 
+
+         cat trid.py | grep "cachefilename = "
+         pwd; ls -lah
+
+    - name: Make AppImage
+      run: |
+        set -x
+        cd squashfs-root/
+        pwd; ls -lah
+
+        #rm -v python* .DirIcon AppRun
+        rm .DirIcon
+
+        #mv python.png TrID.png
+        rm python.png
+        wget https://mark0.net/trid_icon.jpg -O TrID.png
+        mv python3*.desktop TrID.desktop
+
+        cd opt/python3.*/bin/
+        version=$(grep "PROGRAM_VER " trid.py | cut -d '"' -f2)
+        echo "TrID version: $version"
+        pwd; ls -lah
+
+        cd ../../../
+        cat TrID.desktop
+        sed -i "s/Name=.*/Name=TrID/" TrID.desktop
+        cat TrID.desktop
+
+        cd ../
+        pwd; ls -lah
+
+        echo '#!/bin/bash
+        local_folder=$PWD
+        echo "local_folder $local_folder"
+
+        HERE="$(dirname "$(readlink -f "${0}")")"
+        echo "HERE: $HERE"
+        HERE=$(echo "$HERE" | sed "s/usr\/bin//")
+        echo "Removed usr/bin HERE: $HERE"
+
+        cd "$HERE"/opt/python3*/bin/
+        all_Parameters=$@
+        echo -e "all_Parameters: $all_Parameters\n"
+
+        if [ "$all_Parameters" != "" ]; then
+            file=$(echo "$all_Parameters" | rev | cut -d " " -f1 | rev)
+            parameters_less_file=$(echo "$all_Parameters" | rev | cut -d " " -f2- | rev)
+
+            if [ "$parameters_less_file" == "$file" ]; then
+                parameters_less_file=""
+            fi
+
+            file="$local_folder/$file" # Add the current directory, $PWD, to the parameter with file
+            echo "file: $file"
+            echo "parameters_less_file: $parameters_less_file"
+
+            if [ "$parameters_less_file" == "" ]; then # Check if has parameters
+                parameters="$file"
+            else
+                parameters="$parameters_less_file $file"
+            fi
+
+            ./python3.* trid.py "$parameters"
+        else
+            ./python3.* trid.py
+        fi
+        echo'> squashfs-root/AppRun
+        chmod +x squashfs-root/AppRun
+        cat squashfs-root/AppRun
+
+        mv README.md squashfs-root/
+        ls -lah squashfs-root/
+
+        # Wrong permissions on AppDir, please set it to 0755 and try again
+        chmod 0755 squashfs-root/
+
+        ARCH=x86_64 VERSION="${version}-1_JB" ./appimagetool-x86_64.AppImage squashfs-root/
+        ls -lah
+
+        fileName=$(ls TrID*.AppImage)
+        echo "fileName: $fileName"
+        md5sum "$fileName" > "${fileName}.md5"
+        ls -lah
+
+    # Build - Error: Resource not accessible by integration
+    # Change Settings -> Actions -> General -> Workflow Permissions to allow read and write:
+    # https://github.com/actions/first-interaction/issues/10#issuecomment-1506118886
+
+    # https://github.com/marketplace/actions/upload-to-github-release
+    - uses: xresloader/upload-to-github-release@main
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          file: "TrID*.AppImage; TrID*.zsync; TrID*.md5"
+          #delete_file: "random-name-*.txt;random-*.txt"
+          release_id: ${{ steps.create_release.outputs.id }}
+          #overwrite: true
+          verbose: true
+          #tags: true
+          draft: false
+          default_release_name: "TrID V in AppImage"
