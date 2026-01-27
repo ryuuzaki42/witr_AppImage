@@ -57,18 +57,10 @@ jobs:
         pwd; ls -lah
 
         echo '#!/bin/bash
-        local_folder=$PWD
-        echo "local_folder $local_folder"
-
         HERE="$(dirname "$(readlink -f "${0}")")"
-        echo "HERE: $HERE"
-        HERE=$(echo "$HERE" | sed "s/usr\/bin//")
-        echo "Removed usr/bin HERE: $HERE"
-
-        cd "$HERE"/ #opt/python3*/bin/
+        cd "$HERE/"
         all_Parameters=$@
         echo -e "all_Parameters: $all_Parameters\n"
-
         ./witr-linux-amd64 $all_Parameters
         echo'> squashfs-root/AppRun
         chmod +x squashfs-root/AppRun
