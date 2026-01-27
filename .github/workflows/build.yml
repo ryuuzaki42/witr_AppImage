@@ -37,22 +37,17 @@ jobs:
         echo "witr version: $version"
         wget https://github.com/pranshuparmar/witr/releases/download/v$version/witr-linux-amd64
         chmod +x witr-linux-amd64
-        #rm -v python* .DirIcon AppRun
-        #rm .DirIcon
         pwd; ls -lah
 
-        #mv python.png TrID.png
-        #rm python.png
-        wget https://mark0.net/trid_icon.jpg -O TrID.png
-        #mv python3*.desktop witr.desktop
+        wget https://mark0.net/trid_icon.jpg -O witr.png
 
         echo '#!/bin/bash
         [Desktop Entry]
         Type=Application
         Name=witr
-        Exec=python3.13
-        Comment=A Python 3.13 runtime
-        Icon=python
+        Exec=witr
+        Comment=Why is this running?
+        Icon=witr
         Categories=Development;
         Terminal=true
         '> witr.desktop
@@ -85,7 +80,7 @@ jobs:
         ls -lah squashfs-root/
 
         # Wrong permissions on AppDir, please set it to 0755 and try again
-        chmod 0755 squashfs-root/
+        #chmod 0755 squashfs-root/
 
         ARCH=x86_64 VERSION="${version}-1_JB" ./appimagetool-x86_64.AppImage squashfs-root/
         ls -lah
