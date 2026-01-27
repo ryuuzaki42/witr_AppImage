@@ -29,12 +29,12 @@ jobs:
     - name: Make AppImage
       run: |
         set -x
+        version=$(grep -o "witr:.*" README.md | cut -d ' ' -f2)
+        echo "witr version: $version"
+
         mkdir squashfs-root/
         cd squashfs-root/
 
-        version=$(grep -o "witr:.*" README.md | cut -d ' ' -f2)
-        echo "witr version: $version"
-        
         wget https://github.com/pranshuparmar/witr/releases/download/v$version/witr-linux-amd64
         chmod +x witr-linux-amd64
         wget https://github.com/ryuuzaki42/witr_AppImage/releases/download/0/witr.jpg -O witr.jpg
@@ -50,7 +50,6 @@ jobs:
         Categories=Development;
         Terminal=true
         '> witr.desktop
-
         pwd; ls -lah
         cat witr.desktop
 
@@ -78,9 +77,6 @@ jobs:
         mv README.md squashfs-root/
         ls -lah squashfs-root/
 
-        # Wrong permissions on AppDir, please set it to 0755 and try again
-        #chmod 0755 squashfs-root/
-
         ARCH=x86_64 VERSION="${version}-1_JB" ./appimagetool-x86_64.AppImage squashfs-root/
         ls -lah
 
@@ -88,10 +84,6 @@ jobs:
         echo "fileName: $fileName"
         md5sum "$fileName" > "${fileName}.md5"
         ls -lah
-
-    # Build - Error: Resource not accessible by integration
-    # Change Settings -> Actions -> General -> Workflow Permissions to allow read and write:
-    # https://github.com/actions/first-interaction/issues/10#issuecomment-1506118886
 
     # https://github.com/marketplace/actions/upload-to-github-release
     - uses: xresloader/upload-to-github-release@main
