@@ -27,37 +27,40 @@ jobs:
         chmod +x appimagetool-x86_64.AppImage
         pwd; ls -lah
 
-    - name: Get Pyhton AppImage
-      run: |
-        set -x
-        wget https://github.com/ryuuzaki42/Python_to_make_AppImage/releases/download/06/python3.13.3-cp313-cp313-manylinux2014_x86_64.AppImage
-        fileName=$(ls python3*.AppImage)
-        chmod +x "$fileName"
-        ./"$fileName" --appimage-extract
-        pwd; ls -lah
-
     - name: Make AppImage
       run: |
         set -x
+        mkdir squashfs-root/
         cd squashfs-root/
-        pwd; ls -lah
 
         version="0.2.6"
         wget https://github.com/pranshuparmar/witr/releases/download/v$version/witr-linux-amd64
         chmod +x witr-linux-amd64
         #rm -v python* .DirIcon AppRun
-        rm .DirIcon
+        #rm .DirIcon
+        pwd; ls -lah
 
         #mv python.png TrID.png
-        rm python.png
+        #rm python.png
         wget https://mark0.net/trid_icon.jpg -O TrID.png
-        mv python3*.desktop witr.desktop
+        #mv python3*.desktop witr.desktop
+
+        echo '#!/bin/bash
+        [Desktop Entry]
+        Type=Application
+        Name=witr
+        Exec=python3.13
+        Comment=A Python 3.13 runtime
+        Icon=python
+        Categories=Development;
+        Terminal=true
+        echo'> witr.desktop
 
         echo "witr version: $version"
         pwd; ls -lah
 
-        cat witr.desktop
-        sed -i "s/Name=.*/Name=witr/" witr.desktop
+        #cat witr.desktop
+        #sed -i "s/Name=.*/Name=witr/" witr.desktop
         cat witr.desktop
 
         cd ../
