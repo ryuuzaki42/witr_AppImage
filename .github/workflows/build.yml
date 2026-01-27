@@ -37,7 +37,7 @@ jobs:
 
         wget https://github.com/pranshuparmar/witr/releases/download/v$version/witr-linux-amd64
         chmod +x witr-linux-amd64
-        wget https://github.com/ryuuzaki42/witr_AppImage/releases/download/0/witr.jpg -O witr.png # Not png file, but works
+        wget https://github.com/ryuuzaki42/witr_AppImage/releases/download/main-00000000/witr.jpg -O witr.png # Not png file, but works
         pwd; ls -lah
 
         echo '#!/bin/bash
