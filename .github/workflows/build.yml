@@ -1,5 +1,5 @@
 name: Create new release
-# Test 2.47
+# Test 0.2.6
 
 on:
   push:
@@ -36,53 +36,29 @@ jobs:
         ./"$fileName" --appimage-extract
         pwd; ls -lah
 
-    - name: Install TrID and update pip
-      run: |
-        set -x
-        cd squashfs-root/opt/python3*/bin/
-        pwd; ls -lah
-
-        wget https://mark0.net/download/trid.zip
-        wget https://mark0.net/download/triddefs.zip
-        pwd; ls -lah
-
-        unzip trid.zip
-        unzip triddefs.zip
-        rm trid.zip triddefs.zip
-
-        ./pip3.* install --upgrade pip
-
-         #./python3.* trid.py || ls
-
-         # Edit the folder of cache file, .triddefs.trd, from local (./) to tmp (/tmp/) folder
-         sed -i 's/cachefilename = path.parent \/ cachefilename/cachefilename = "\/tmp\/" + str(path.parent \/ cachefilename)/' trid.py 
-
-         cat trid.py | grep "cachefilename = "
-         pwd; ls -lah
-
     - name: Make AppImage
       run: |
         set -x
         cd squashfs-root/
         pwd; ls -lah
 
+        version="0.2.6"
+        wget https://github.com/pranshuparmar/witr/releases/download/v$version/witr-linux-amd64
         #rm -v python* .DirIcon AppRun
         rm .DirIcon
 
         #mv python.png TrID.png
         rm python.png
         wget https://mark0.net/trid_icon.jpg -O TrID.png
-        mv python3*.desktop TrID.desktop
+        mv python3*.desktop witr.desktop
 
-        cd opt/python3.*/bin/
-        version=$(grep "PROGRAM_VER " trid.py | cut -d '"' -f2)
-        echo "TrID version: $version"
+        echo "witr version: $version"
         pwd; ls -lah
 
         cd ../../../
-        cat TrID.desktop
-        sed -i "s/Name=.*/Name=TrID/" TrID.desktop
-        cat TrID.desktop
+        cat witr.desktop
+        sed -i "s/Name=.*/Name=witr/" witr.desktop
+        cat witr.desktop
 
         cd ../
         pwd; ls -lah
@@ -96,32 +72,11 @@ jobs:
         HERE=$(echo "$HERE" | sed "s/usr\/bin//")
         echo "Removed usr/bin HERE: $HERE"
 
-        cd "$HERE"/opt/python3*/bin/
+        cd "$HERE"/ #opt/python3*/bin/
         all_Parameters=$@
         echo -e "all_Parameters: $all_Parameters\n"
 
-        if [ "$all_Parameters" != "" ]; then
-            file=$(echo "$all_Parameters" | rev | cut -d " " -f1 | rev)
-            parameters_less_file=$(echo "$all_Parameters" | rev | cut -d " " -f2- | rev)
-
-            if [ "$parameters_less_file" == "$file" ]; then
-                parameters_less_file=""
-            fi
-
-            file="$local_folder/$file" # Add the current directory, $PWD, to the parameter with file
-            echo "file: $file"
-            echo "parameters_less_file: $parameters_less_file"
-
-            if [ "$parameters_less_file" == "" ]; then # Check if has parameters
-                parameters="$file"
-            else
-                parameters="$parameters_less_file $file"
-            fi
-
-            ./python3.* trid.py "$parameters"
-        else
-            ./python3.* trid.py
-        fi
+        ./witr-linux-amd64
         echo'> squashfs-root/AppRun
         chmod +x squashfs-root/AppRun
         cat squashfs-root/AppRun
@@ -135,7 +90,7 @@ jobs:
         ARCH=x86_64 VERSION="${version}-1_JB" ./appimagetool-x86_64.AppImage squashfs-root/
         ls -lah
 
-        fileName=$(ls TrID*.AppImage)
+        fileName=$(ls witr*.AppImage)
         echo "fileName: $fileName"
         md5sum "$fileName" > "${fileName}.md5"
         ls -lah
@@ -149,11 +104,11 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          file: "TrID*.AppImage; TrID*.zsync; TrID*.md5"
+          file: "witr*.AppImage; witr*.zsync; witr*.md5"
           #delete_file: "random-name-*.txt;random-*.txt"
           release_id: ${{ steps.create_release.outputs.id }}
           #overwrite: true
           verbose: true
           #tags: true
           draft: false
-          default_release_name: "TrID V in AppImage"
+          default_release_name: "witr V in AppImage"
