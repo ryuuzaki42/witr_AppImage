@@ -1,5 +1,4 @@
 name: Create new release
-# Test 0.2.6
 
 on:
   push:
@@ -33,13 +32,13 @@ jobs:
         mkdir squashfs-root/
         cd squashfs-root/
 
-        version="0.2.6"
+        version=$(grep -o "witr:.*" README.md | cut -d ' ' -f2)
         echo "witr version: $version"
+        
         wget https://github.com/pranshuparmar/witr/releases/download/v$version/witr-linux-amd64
         chmod +x witr-linux-amd64
+        wget https://github.com/ryuuzaki42/witr_AppImage/releases/download/0/witr.jpg -O witr.jpg
         pwd; ls -lah
-
-        wget https://mark0.net/trid_icon.jpg -O witr.png
 
         echo '#!/bin/bash
         [Desktop Entry]
