@@ -8,7 +8,7 @@ witr tracks processes and their causal ancestry, explaining origins, supervising
 https://github.com/pranshuparmar/witr
 
 ## Repository: https://github.com/ryuuzaki42/witr_AppImage
-    witr: 0.2.6
+    witr: 0.2.7
 
 ## Usage
 ```
