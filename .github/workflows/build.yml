@@ -40,16 +40,15 @@ jobs:
         wget https://github.com/ryuuzaki42/witr_AppImage/releases/download/main-00000000/witr.jpg -O witr.png # Not png file, but works
         pwd; ls -lah
 
-        cat > witr.desktop << EOF
-        [Desktop Entry]
+        echo '[Desktop Entry]
         Type=Application
         Name=witr
         Exec=witr
         Comment=Why is this running?
         Icon=witr
         Categories=Utility
-        Terminal=true
-        EOF
+        Terminal=true' > witr.desktop
+        chmod +x witr.desktop
 
         pwd; ls -lah
         cat witr.desktop
