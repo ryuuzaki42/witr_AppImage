@@ -10,9 +10,11 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    #runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v6
     - name: Install fuse and libfuse2
       run: sudo apt install fuse libfuse2
 
@@ -49,8 +51,6 @@ jobs:
         Categories=Utility
         Terminal=true' > witr.desktop
         chmod +x witr.desktop
-
-        pwd; ls -lah
         cat witr.desktop
 
         cd ../
@@ -78,15 +78,12 @@ jobs:
         ls -lah
 
     # https://github.com/marketplace/actions/upload-to-github-release
-    - uses: xresloader/upload-to-github-release@main
+    - uses: xresloader/upload-to-github-release@v1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           file: "witr*.AppImage; witr*.zsync; witr*.md5"
-          #delete_file: "random-name-*.txt;random-*.txt"
-          release_id: ${{ steps.create_release.outputs.id }}
           #overwrite: true
           verbose: true
-          #tags: true
           draft: false
           default_release_name: "witr V in AppImage"
