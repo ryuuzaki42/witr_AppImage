@@ -23,7 +23,6 @@ jobs:
         set -x
         version_go_appimage=$(wget -q -O - https://api.github.com/repos/probonopd/go-appimage/releases | grep "\"name.*appimagetool-.*-x86_64.AppImage\"" | head -n 1 | cut -d '-' -f2)
         echo "version_go_appimage: $version_go_appimage"
-
         wget -q "https://github.com/probonopd/go-appimage/releases/download/continuous/appimagetool-$version_go_appimage-x86_64.AppImage" -O appimagetool-x86_64.AppImage
         chmod +x appimagetool-x86_64.AppImage
         pwd; ls -lah
@@ -37,9 +36,9 @@ jobs:
         mkdir squashfs-root/
         cd squashfs-root/
 
-        wget https://github.com/pranshuparmar/witr/releases/download/v$version/witr-linux-amd64
+        wget -q https://github.com/pranshuparmar/witr/releases/download/v$version/witr-linux-amd64
         chmod +x witr-linux-amd64
-        wget https://github.com/ryuuzaki42/witr_AppImage/releases/download/main-00000000/witr.jpg -O witr.png # Not png file, but works
+        wget -q https://github.com/ryuuzaki42/witr_AppImage/releases/download/main-00000000/witr.jpg -O witr.png # Not png file, but works
         pwd; ls -lah
 
         echo '[Desktop Entry]
@@ -53,31 +52,27 @@ jobs:
         chmod +x witr.desktop
         cat witr.desktop
 
-        cd ../
-        pwd; ls -lah
-
         echo '#!/bin/bash
         HERE="$(dirname "$(readlink -f "${0}")")"
-        cd "$HERE/"
-        all_Parameters=$@
-        echo -e "all_Parameters: $all_Parameters\n"
-        ./witr-linux-amd64 $all_Parameters
-        echo'> squashfs-root/AppRun
-        chmod +x squashfs-root/AppRun
-        cat squashfs-root/AppRun
+        echo -e "\nParameters: $@\n"
 
-        mv README.md squashfs-root/
+        $HERE/witr-linux-amd64 $@
+        echo' > AppRun
+        chmod +x AppRun
+        cat AppRun
+
+        cd ../
+        cp README.md squashfs-root/
         ls -lah squashfs-root/
 
         ARCH=x86_64 VERSION="${version}-1_JB" ./appimagetool-x86_64.AppImage squashfs-root/
-        ls -lah
+        pwd; ls -lah
 
         fileName=$(ls witr*.AppImage)
         echo "fileName: $fileName"
         md5sum "$fileName" > "${fileName}.md5"
-        ls -lah
+        pwd; ls -lah
 
-    # https://github.com/marketplace/actions/upload-to-github-release
     - uses: xresloader/upload-to-github-release@v1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
