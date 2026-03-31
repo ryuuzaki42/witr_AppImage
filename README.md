@@ -1,9 +1,9 @@
 
 # witr_AppImage
 
-witr is a CLI utility designed to answer "Why is this running?".
+witr is a CLI utility designed to answer "Why is this running?"
 
-witr tracks processes and their causal ancestry, explaining origins, supervising service, context like directories and containers, risk signals, JSON output, and open ports.
+witr tracks processes and their causal ancestry, explaining origins, supervising service, context like directories and containers, risk signals, JSON output, and open ports
 
 https://github.com/pranshuparmar/witr
 
@@ -12,7 +12,7 @@ https://github.com/pranshuparmar/witr
 
 ## Usage
 ```
-# Base:
+    # Base:
     ./witr*_JB-x86_64.AppImage
 
     # Inspect a running process by name
@@ -36,7 +36,6 @@ https://github.com/pranshuparmar/witr
     # Help and more informations
     ./witr*_JB-x86_64.AppImage -h
 ```
-
 ### Permissions Note
 witr inspects system directories which may require elevated permissions.
 If you are not seeing the expected information, try running as root.
